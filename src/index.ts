@@ -1,13 +1,13 @@
 import { eq } from 'drizzle-orm';
-import { db } from './db.js';
-import { demoUsers } from './schema.js';
+import { index } from './db/index.js';
+import { demoUsers } from './db/schema/index.js';
 
 async function main() {
   try {
     console.log('Performing CRUD operations...');
 
     // CREATE: Insert a new user
-    const [newUser] = await db
+    const [newUser] = await index
       .insert(demoUsers)
       .values({ name: 'Admin User', email: 'admin@example.com' })
       .returning();
@@ -19,11 +19,11 @@ async function main() {
     console.log('✅ CREATE: New user created:', newUser);
 
     // READ: Select the user
-    const foundUser = await db.select().from(demoUsers).where(eq(demoUsers.id, newUser.id));
+    const foundUser = await index.select().from(demoUsers).where(eq(demoUsers.id, newUser.id));
     console.log('✅ READ: Found user:', foundUser[0]);
 
     // UPDATE: Change the user's name
-    const [updatedUser] = await db
+    const [updatedUser] = await index
       .update(demoUsers)
       .set({ name: 'Super Admin' })
       .where(eq(demoUsers.id, newUser.id))
@@ -36,7 +36,7 @@ async function main() {
     console.log('✅ UPDATE: User updated:', updatedUser);
 
     // DELETE: Remove the user
-    await db.delete(demoUsers).where(eq(demoUsers.id, newUser.id));
+    await index.delete(demoUsers).where(eq(demoUsers.id, newUser.id));
     console.log('✅ DELETE: User deleted.');
 
     console.log('\nCRUD operations completed successfully.');
